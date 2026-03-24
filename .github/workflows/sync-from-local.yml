@@ -1,0 +1,19 @@
+name: Sync from Local
+
+on:
+  workflow_dispatch:
+  repository_dispatch:
+    types: [sync-from-local]
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Sync skills
+        run: |
+          # This workflow is a placeholder for automated sync
+          # In practice, sync is done via local sync-from-local.sh script
+          echo "To sync from local, run: ./sync-from-local.sh"
+          echo "Then commit and push changes."
