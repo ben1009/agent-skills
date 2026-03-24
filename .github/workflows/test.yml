@@ -1,0 +1,31 @@
+name: Tests
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run sync tests
+        run: |
+          chmod +x tests/test_sync.sh
+          ./tests/test_sync.sh
+
+      - name: Test scripts are executable
+        run: |
+          test -x sync-to-local.sh
+          test -x sync-from-local.sh
+          echo "All scripts are executable"
+
+      - name: Verify skill files exist
+        run: |
+          test -f git-workflow/SKILL.md
+          test -f pr-create/SKILL.md
+          test -f pr-review/SKILL.md
+          echo "All skill files exist"

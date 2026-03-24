@@ -38,4 +38,14 @@ cp -r git-workflow pr-create pr-review ~/.config/agents/skills/
 
 ## License
 
-MIT
+Apache 2.0 - see [LICENSE](LICENSE)
+
+## Testing
+
+Run the test suite to verify sync logic:
+
+```bash
+./tests/test_sync.sh
+```
+
+Tests are automatically run on every push via GitHub Actions.
