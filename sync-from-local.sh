@@ -16,5 +16,5 @@ for skill in git-workflow pr-create pr-review; do
     fi
 done
 
-echo "Done! Skills synced successfully."
+echo "Done! Skills synced from ~/.config/agents/skills/"
 echo "Don't forget to commit and push the changes!"

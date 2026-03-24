@@ -1,6 +1,6 @@
-# Kimi Skills
+# Agent Skills
 
-A collection of reusable skills for Kimi Code CLI agents.
+A collection of reusable skills for AI agents.
 
 ## Skills Included
 
@@ -12,7 +12,7 @@ A collection of reusable skills for Kimi Code CLI agents.
 
 ## Usage
 
-These skills are designed to be used with Kimi Code CLI. Place them in your agents skills directory:
+These skills are designed to be used with AI agents (Claude, GPT, Gemini, Kimi, etc.). Place them in your agents skills directory:
 
 ```
 ~/.config/agents/skills/

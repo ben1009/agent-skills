@@ -9,7 +9,7 @@ This repository is kept in sync with the local skills directory at `~/.config/ag
 When you've updated skills locally and want to push to GitHub:
 
 ```bash
-cd /path/to/kimi-skills
+cd /path/to/agent-skills
 ./sync-from-local.sh
 git add -A
 git commit -m "sync: update skills from local"
@@ -21,7 +21,7 @@ git push origin master
 When you've pulled updates from GitHub and want to apply to local:
 
 ```bash
-cd /path/to/kimi-skills
+cd /path/to/agent-skills
 ./sync-to-local.sh
 ```
 
