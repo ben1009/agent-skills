@@ -1,11 +1,47 @@
 ---
 name: pr-create
-description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, and PR creation. Optionally watches for review comments.
+description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, and PR creation. Optionally watches for review comments. Enforces key branch protection rules.
 ---
 
 # PR Create Skill
 
 Create a pull request from your local changes with proper checks and optional comment watching.
+
+## ⚠️ CRITICAL RULES - NEVER VIOLATE
+
+### 1. NEVER Push to Protected Branches (main/master)
+
+**Always create feature branch first.** Never run:
+```bash
+# ❌ FORBIDDEN - Never do this
+git push origin master
+git push origin main
+```
+
+### 2. NEVER Merge PR Without User Confirmation
+
+**Always ask user before merging**, even if all checks pass.
+
+Correct workflow:
+```bash
+gh pr checks --watch      # Wait for checks
+# Ask: "All checks passed. Should I merge this PR?"
+gh pr merge               # Only after user says yes
+```
+
+### 3. ALWAYS Use English in PR Title and Description
+
+**PR title and body must be in English**, regardless of the user's input language.
+
+```bash
+# ❌ WRONG - Non-English PR title
+gh pr create --title "修复: 按钮样式" --body "..."
+
+# ✅ CORRECT - English PR title  
+gh pr create --title "fix: button style" --body "..."
+```
+
+**Even if user asks in Chinese/Japanese/Other language**, translate to English for PR.
 
 ## Usage
 
@@ -118,7 +154,22 @@ curl -s -X POST \
   }'
 ```
 
-### Phase 5: Optional Auto-Watch ⭐
+### Phase 5: Merge (Only With User Confirmation)
+
+**⚠️ NEVER auto-merge. Always ask user first.**
+
+```bash
+# 1. Check all checks passed
+gh pr checks
+
+# 2. Ask user explicitly
+"All checks passed. Should I merge this PR?"
+
+# 3. Only merge after explicit user approval
+gh pr merge --squash --delete-branch
+```
+
+### Phase 6: Optional Auto-Watch ⭐
 
 If user requested watching for comments:
 
@@ -129,8 +180,8 @@ If user requested watching for comments:
 
 **When comments detected:**
 - Notify user: "New review comments available"
-- Suggest: "Use 'pr-review' skill to handle comments"
-- Do NOT auto-fix (use pr-review skill for that)
+- **Do NOT handle comments in this skill** - Use 'pr-review' skill instead
+- Suggest: "Run 'pr-review' skill to handle these comments"
 
 ## Error Handling
 
@@ -140,6 +191,31 @@ If user requested watching for comments:
 | Push rejected | `git pull origin <branch>` first, then push |
 | PR already exists | Update existing PR with new commits |
 | Network timeout | Retry with exponential backoff |
+| Accidentally pushed to master | Revert immediately: `git revert HEAD --no-edit && git push origin master` |
+
+## What NOT To Do
+
+| ❌ Forbidden | Why |
+|-------------|-----|
+| `git push origin master/main` | Bypasses PR workflow and code review |
+| Auto-merge without asking | User must approve all merges |
+| Commit directly to protected branch | Always use feature branch |
+
+## Quick Reference: Protected Branch Workflow
+
+```bash
+# ✅ CORRECT: Feature branch workflow
+git checkout main
+git pull origin main
+git checkout -b feat/my-change
+git add -A
+git commit -m "feat: my change"
+git push -u origin feat/my-change
+gh pr create --title "feat: my change"
+gh pr checks --watch
+# Ask user before merging!
+gh pr merge --squash --delete-branch
+```
 
 ## Integration with Other Skills
 
