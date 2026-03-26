@@ -38,22 +38,22 @@ This project does not require compilation, dependency installation, or a build s
 ```
 agent-skills/
 ├── git-workflow/           # Git workflow skill
-│   └── SKILL.md           # Skill documentation with YAML frontmatter
-├── pr-create/             # PR creation skill
+│   └── SKILL.md            # Skill documentation with YAML frontmatter
+├── pr-create/              # PR creation skill
 │   └── SKILL.md
-├── pr-review/             # PR review skill
+├── pr-review/              # PR review skill
 │   └── SKILL.md
-├── tests/                 # Test suite
-│   └── test_sync.sh       # Bash tests for sync scripts
-├── .github/workflows/     # CI/CD configurations
-│   ├── test.yml          # Run tests on push/PR
-│   └── sync-from-local.yml  # Manual sync workflow
-├── sync-to-local.sh       # Sync repo → local skills dir
-├── sync-from-local.sh     # Sync local skills dir → repo
-├── README.md             # Human-facing documentation
-├── CONTRIBUTING.md       # Contribution guidelines
-├── LICENSE               # Apache 2.0 license
-└── AGENTS.md            # This file (AI agent guide)
+├── tests/                  # Test suite
+│   └── test_sync.sh        # Bash tests for sync scripts
+├── .github/workflows/      # CI/CD configurations
+│   ├── test.yml            # Run tests on push/PR
+│   └── sync-from-local.yml # Manual sync workflow
+├── sync-to-local.sh        # Sync repo → local skills dir
+├── sync-from-local.sh      # Sync local skills dir → repo
+├── README.md               # Human-facing documentation
+├── CONTRIBUTING.md         # Contribution guidelines
+├── LICENSE                 # Apache 2.0 license
+└── AGENTS.md               # This file (AI agent guide)
 ```
 
 ## Skill File Format
@@ -95,13 +95,9 @@ Content...
 1. Create a new directory: `mkdir new-skill`
 2. Add `SKILL.md` with proper YAML frontmatter (see format above)
 3. Update `README.md` to include the new skill in the table
-4. Update both sync scripts to include the new skill name:
-   - `sync-to-local.sh`: Add to the `for skill in ...` loop
-   - `sync-from-local.sh`: Add to the `for skill in ...` loop
-   - `tests/test_sync.sh`: Add to skill lists in test setup
-5. Test the sync: `./tests/test_sync.sh`
-6. Sync to local: `./sync-to-local.sh`
-7. Commit and push
+4. Test the sync: `./tests/test_sync.sh`
+5. Sync to local: `./sync-to-local.sh`
+6. Commit and push
 
 ### Modifying an Existing Skill
 
@@ -119,7 +115,7 @@ The repository is designed to sync with the local agents skills directory at `~/
 ./sync-from-local.sh
 git add -A
 git commit -m "sync: update skills from local"
-git push origin master
+git push origin main
 ```
 
 **Repo → Local (Test changes):**

@@ -8,13 +8,20 @@ REPO_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 echo "Syncing skills from $SKILLS_DIR..."
 
-for skill in git-workflow pr-create pr-review; do
-    if [ -d "$SKILLS_DIR/$skill" ]; then
-        echo "  → $skill"
-        mkdir -p "$REPO_DIR/$skill"
-        cp "$SKILLS_DIR/$skill/SKILL.md" "$REPO_DIR/$skill/"
+# Auto-discover skill directories by finding all SKILL.md files
+while IFS= read -r skill_file; do
+    skill_dir=$(dirname "$skill_file")
+    skill=$(basename "$skill_dir")
+    
+    # Skip if it's the root directory
+    if [ "$skill" = "." ]; then
+        continue
     fi
-done
+    
+    echo "  → $skill"
+    mkdir -p "$REPO_DIR/$skill"
+    cp "$SKILLS_DIR/$skill/SKILL.md" "$REPO_DIR/$skill/"
+done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -name "SKILL.md" 2>/dev/null || true)
 
 echo "Done! Skills synced from ~/.config/agents/skills/"
 echo "Don't forget to commit and push the changes!"

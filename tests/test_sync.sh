@@ -36,12 +36,21 @@ create_sync_scripts() {
 set -e
 SKILLS_DIR="$1"
 REPO_DIR="$2"
-for skill in git-workflow pr-create pr-review; do
-    if [ -d "$REPO_DIR/$skill" ]; then
-        mkdir -p "$SKILLS_DIR/$skill"
-        cp "$REPO_DIR/$skill/SKILL.md" "$SKILLS_DIR/$skill/"
+
+# Auto-discover skill directories by finding all SKILL.md files
+while IFS= read -r skill_file; do
+    skill_dir=$(dirname "$skill_file")
+    skill=$(basename "$skill_dir")
+    
+    # Skip if it's the root directory or a special directory
+    if [ "$skill" = "." ] || [ "$skill" = "tests" ] || [ "$skill" = ".github" ]; then
+        continue
     fi
-done
+    
+    echo "  → $skill"
+    mkdir -p "$SKILLS_DIR/$skill"
+    cp "$REPO_DIR/$skill/SKILL.md" "$SKILLS_DIR/$skill/"
+done < <(find "$REPO_DIR" -mindepth 2 -maxdepth 2 -name "SKILL.md" | grep -v "/tests/" | grep -v "/.github/")
 EOF
     chmod +x "$TEST_DIR/sync-to-local.sh"
     
@@ -50,12 +59,21 @@ EOF
 set -e
 SKILLS_DIR="$1"
 REPO_DIR="$2"
-for skill in git-workflow pr-create pr-review; do
-    if [ -d "$SKILLS_DIR/$skill" ]; then
-        mkdir -p "$REPO_DIR/$skill"
-        cp "$SKILLS_DIR/$skill/SKILL.md" "$REPO_DIR/$skill/"
+
+# Auto-discover skill directories by finding all SKILL.md files
+while IFS= read -r skill_file; do
+    skill_dir=$(dirname "$skill_file")
+    skill=$(basename "$skill_dir")
+    
+    # Skip if it's the root directory
+    if [ "$skill" = "." ]; then
+        continue
     fi
-done
+    
+    echo "  → $skill"
+    mkdir -p "$REPO_DIR/$skill"
+    cp "$SKILLS_DIR/$skill/SKILL.md" "$REPO_DIR/$skill/"
+done < <(find "$SKILLS_DIR" -mindepth 2 -maxdepth 2 -name "SKILL.md" 2>/dev/null || true)
 EOF
     chmod +x "$TEST_DIR/sync-from-local.sh"
 }
