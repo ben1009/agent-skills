@@ -1,30 +1,41 @@
 ---
 name: pr-review
-description: Handle pull request review comments. Fetches, presents, and helps fix review comments with user confirmation. Never auto-fixes without approval.
+description: Handle pull request review workflow - comments, CI checks, and merge. Fetches review comments, checks CI status, and manages merge with user confirmation.
 ---
 
 # PR Review Skill
 
-Handle review comments on a pull request with user control over all fixes.
+Handle the complete PR review workflow: review comments, CI checks, and merge.
 
-**⚠️ IMPORTANT: This skill NEVER auto-fixes. Always asks user before making changes.**
+**⚠️ IMPORTANT: This skill NEVER auto-fixes or auto-merges. Always asks user before making changes.**
 
 ## Usage
 
 ```bash
-# Read and summarize comments
+# Read and summarize review comments
 "read the comments"
 "show pr comments"
 "check reviews"
 
+# Check CI status
+"check pr status"
+"are checks passing?"
+
+# Complete review workflow
+"review pr"          # Check comments + CI status
+
 # Fix comments (after user confirmation)
 "fix review comments"
 "address pr feedback"
+
+# Merge (after user confirmation)
+"merge pr"
+"is this ready to merge?"
 ```
 
 ## Workflow
 
-### Step 1: Fetch Comments
+### Step 1: Fetch Review Comments
 
 ```bash
 # Method 1: Try gh CLI first
@@ -43,46 +54,55 @@ curl -s \
   https://api.github.com/repos/OWNER/REPO/issues/<number>/comments
 ```
 
-### Step 2: Present to User
+### Step 2: Check CI Status
 
-Summarize findings by severity:
+```bash
+# Check current status
+gh pr checks <number>
+
+# Watch checks in real-time
+gh pr checks <number> --watch
+
+# View PR overview with status
+gh pr view <number>
+```
+
+### Step 3: Present Summary
+
+Summarize findings by category:
 
 ```
-Found N review comments:
+PR #17 Review Summary:
 
+📝 Review Comments: 6 found
 🔴 Critical (1):
-- File: src/x.js, Line 42
-- Bot: gemini-code-assist
-- Issue: Function X missing, causes runtime error
+   - File: src/x.rs, Line 42
+   - Issue: Function X missing
 
-🟡 Medium (1):
-- File: src/y.js, Line 88  
-- Bot: chatgpt-codex-connector
-- Issue: Variable naming inconsistent
+🟡 Medium (2):
+   - File: src/y.rs, Line 88
+   - Issue: Variable naming inconsistent
 
-🟢 Low (1):
-- File: docs/README.md
-- Bot: typo-bot
-- Issue: Typo in documentation
+✅ CI Checks: PASSING
+   - All 5 checks passed
+
+📊 Status: Ready for review fixes
 ```
 
-### Step 3: Ask Before Fixing ⭐ REQUIRED
+### Step 4: Address Review Comments ⭐ USER DECISION
 
-**Must ask explicitly:**
+**Ask user before fixing:**
 
-> "Would you like me to address these review comments?"
+> "Found 6 review comments (1 critical, 2 medium, 3 low). CI checks are passing.
+> Would you like me to address these comments?"
 > 
 > Options:
 > - [ ] Fix all issues automatically
 > - [ ] Fix only critical issues
 > - [ ] Show me the code first
-> - [ ] I'll handle it myself
+> - [ ] Ignore - I'll handle it myself
 
-**Never auto-fix without explicit user confirmation.**
-
-### Step 4: Apply Fixes (If Confirmed)
-
-For each confirmed fix:
+**If confirmed, apply fixes:**
 
 ```bash
 # Make the fix
@@ -104,6 +124,42 @@ fix: address review comments - use Path instead of PathBuf
 - Improves API ergonomics
 ```
 
+### Step 5: Merge PR ⭐ USER CONFIRMATION REQUIRED
+
+**⚠️ NEVER auto-merge. Always ask user first.**
+
+**Prerequisites for merge:**
+1. All review comments addressed (or intentionally skipped)
+2. All CI checks passing
+3. No merge conflicts
+
+**Ask explicitly:**
+
+> "All review comments have been addressed and CI checks are passing.
+> Should I merge this PR?"
+> 
+> Options:
+> - [ ] Yes, merge with squash
+> - [ ] Yes, merge with merge commit
+> - [ ] Yes, rebase and merge
+> - [ ] No, I'll merge manually
+
+**After user confirms:**
+
+```bash
+# Check final status
+gh pr checks <number>
+
+# Merge (default: squash)
+gh pr merge <number> --squash --delete-branch
+
+# Or with merge commit
+gh pr merge <number> --merge --delete-branch
+
+# Or rebase
+gh pr merge <number> --rebase --delete-branch
+```
+
 ## Patterns
 
 ### Multiple Review Rounds
@@ -111,15 +167,23 @@ fix: address review comments - use Path instead of PathBuf
 ```
 Round 1: Initial PR created
   ↓
-Bot comments received
+Bot/human comments received
   ↓
-Ask user → User confirms fixes
+User: "review pr"
+  ↓
+Present summary → User confirms fixes
   ↓
 Apply fixes, commit, push
   ↓
 Round 2: New comments or follow-up
   ↓
-Ask user again → Address or discuss
+User: "review pr" again
+  ↓
+Check new comments + CI status
+  ↓
+User confirms merge
+  ↓
+Merge PR
 ```
 
 ### Human Reviewer + Bots
@@ -138,6 +202,8 @@ When both human and bot comments exist:
 | Stash pop conflicts | Ask user to resolve manually |
 | Push rejected (non-fast-forward) | `git pull origin <branch>` first, then push |
 | Network timeout | Retry with exponential backoff |
+| Checks failing | Report failures, ask if user wants to fix or wait |
+| Merge conflicts | Ask user to resolve manually |
 
 ## Integration with Other Skills
 
@@ -151,8 +217,9 @@ When both human and bot comments exist:
 ## Example Session
 
 ```
-User: "read the comments"
+User: "review pr"
 → Fetch comments via API
+→ Check CI status
 → Summarize by severity
 → Present to user
 
@@ -162,6 +229,14 @@ User: "fix all"
 → Apply fixes
 → Commit → Push
 → "Fixes pushed. PR updated."
+
+User: "is it ready to merge?"
+→ Check comments (all resolved?) ✓
+→ Check CI status (passing?) ✓
+→ "All checks pass. Should I merge?"
+→ User confirms
+→ gh pr merge --squash --delete-branch
+→ "PR #17 merged successfully!"
 ```
 
 ## Anti-Patterns
@@ -170,6 +245,9 @@ User: "fix all"
 ```bash
 # Auto-fix without asking
 gh pr view --comments | fix-all.sh
+
+# Auto-merge without asking
+gh pr merge --squash
 ```
 
 ✅ **Always do this:**
@@ -179,4 +257,10 @@ gh pr view --comments
 # "Would you like me to fix these?"
 # [User confirms]
 # Then apply fixes
+
+# Check → Ask → Merge
+gh pr checks
+# "Should I merge this PR?"
+# [User confirms]
+# Then merge
 ```

@@ -1,6 +1,6 @@
 ---
 name: pr-create
-description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, and PR creation. Optionally watches for review comments. Enforces key branch protection rules.
+description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, and PR creation. Enforces key branch protection rules. (For review, checks, and merge, use pr-review skill.)
 ---
 
 # PR Create Skill
@@ -154,20 +154,9 @@ curl -s -X POST \
   }'
 ```
 
-### Phase 5: Merge (Only With User Confirmation)
+### Phase 5: Done
 
-**⚠️ NEVER auto-merge. Always ask user first.**
-
-```bash
-# 1. Check all checks passed
-gh pr checks
-
-# 2. Ask user explicitly
-"All checks passed. Should I merge this PR?"
-
-# 3. Only merge after explicit user approval
-gh pr merge --squash --delete-branch
-```
+The PR has been created. The next steps (review, checks, merge) are handled by the `pr-review` skill.
 
 ### Phase 6: Optional Auto-Watch ⭐
 
@@ -204,7 +193,7 @@ If user requested watching for comments:
 ## Quick Reference: Protected Branch Workflow
 
 ```bash
-# ✅ CORRECT: Feature branch workflow
+# ✅ CORRECT: Feature branch workflow (create phase)
 git checkout main
 git pull origin main
 git checkout -b feat/my-change
@@ -212,9 +201,8 @@ git add -A
 git commit -m "feat: my change"
 git push -u origin feat/my-change
 gh pr create --title "feat: my change"
-gh pr checks --watch
-# Ask user before merging!
-gh pr merge --squash --delete-branch
+
+# Next: Use pr-review skill for review, checks, and merge
 ```
 
 ## Integration with Other Skills
@@ -223,7 +211,7 @@ gh pr merge --squash --delete-branch
 |------|-----------|
 | Git commit format | `git-workflow` |
 | Force push guidelines | `git-workflow` |
-| Handle review comments | `pr-review` |
+| Review comments, CI checks, merge | `pr-review` |
 | Split/amend commits | `git-workflow` |
 
 ## Example Session
