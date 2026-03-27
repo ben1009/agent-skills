@@ -96,11 +96,11 @@ PR #17 Review Summary:
 > "Found 6 review comments (1 critical, 2 medium, 3 low). CI checks are passing.
 > Would you like me to address these comments?"
 > 
-> Options:
-> - [ ] Fix all issues automatically
-> - [ ] Fix only critical issues
-> - [ ] Show me the code first
-> - [ ] Ignore - I'll handle it myself
+> Select:
+> 1. Fix all issues automatically
+> 2. Fix only critical issues
+> 3. Show me the code first
+> 4. Ignore - I'll handle it myself
 
 **If confirmed, apply fixes:**
 
@@ -138,11 +138,11 @@ fix: address review comments - use Path instead of PathBuf
 > "All review comments have been addressed and CI checks are passing.
 > Should I merge this PR?"
 > 
-> Options:
-> - [ ] Yes, merge with squash
-> - [ ] Yes, merge with merge commit
-> - [ ] Yes, rebase and merge
-> - [ ] No, I'll merge manually
+> Select:
+> 1. Yes, merge with squash
+> 2. Yes, merge with merge commit
+> 3. Yes, rebase and merge
+> 4. No, I'll merge manually
 
 **After user confirms:**
 
@@ -224,17 +224,17 @@ User: "review pr"
 → Present to user
 
 User: "fix all"
-→ "Which ones?"
-→ User selects: Fix all critical
-→ Apply fixes
+→ "Select: 1-Fix all, 2-Critical only, 3-Show code, 4-Ignore"
+→ User selects: 2
+→ Apply critical fixes only
 → Commit → Push
 → "Fixes pushed. PR updated."
 
 User: "is it ready to merge?"
 → Check comments (all resolved?) ✓
 → Check CI status (passing?) ✓
-→ "All checks pass. Should I merge?"
-→ User confirms
+→ "All checks pass. Select merge option:"
+→ User selects: 1 (merge with squash)
 → gh pr merge --squash --delete-branch
 → "PR #17 merged successfully!"
 ```
@@ -254,13 +254,13 @@ gh pr merge --squash
 ```bash
 # Present → Ask → Fix
 gh pr view --comments
-# "Would you like me to fix these?"
-# [User confirms]
+# "Select: 1-Fix all, 2-Critical only, 3-Show code, 4-Ignore"
+# User selects: 2
 # Then apply fixes
 
 # Check → Ask → Merge
 gh pr checks
-# "Should I merge this PR?"
-# [User confirms]
+# "Select: 1-Squash, 2-Merge commit, 3-Rebase, 4-Cancel"
+# User selects: 1
 # Then merge
 ```
