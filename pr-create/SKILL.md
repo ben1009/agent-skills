@@ -1,6 +1,6 @@
 ---
 name: pr-create
-description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, and PR creation. Enforces key branch protection rules. (For review, checks, and merge, use pr-review skill.)
+description: Create a pull request from local changes. Handles workspace preparation, local checks, commit, push, PR creation, and optional comment watching. Defers comment handling and merge to the pr-review skill.
 ---
 
 # PR Create Skill
