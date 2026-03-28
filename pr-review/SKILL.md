@@ -148,6 +148,16 @@ gh pr edit <number> --body-file updated_description.md
 gh pr edit <number> --body "Updated description..."
 ```
 
+**If `gh pr edit` fails:**
+If you encounter GraphQL errors, use the REST API as a fallback:
+```bash
+curl -s -X PATCH \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/OWNER/REPO/pulls/<number> \
+  -d '{"body": "new body content"}'
+```
+
 **When to update:**
 | Scenario | Action |
 |----------|--------|
