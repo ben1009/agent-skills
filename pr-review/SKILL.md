@@ -28,6 +28,10 @@ Handle the complete PR review workflow: review comments, CI checks, and merge.
 "fix review comments"
 "address pr feedback"
 
+# Update PR description after fixes
+"update pr description"
+"edit pr body"
+
 # Merge (after user confirmation)
 "merge pr"
 "is this ready to merge?"
@@ -124,6 +128,45 @@ fix: address review comments - use Path instead of PathBuf
 - Improves API ergonomics
 ```
 
+### Step 4b: Update PR Description (Optional)
+
+After addressing review comments, consider updating the PR description to reflect:
+- Changes made during review
+- Fixes applied (with before/after summary)
+- New tests added
+- Breaking changes introduced
+
+**Ask user:**
+> "I've addressed the review comments and pushed fixes. Would you like me to update the PR description to reflect these changes?"
+
+**To update:**
+```bash
+# Edit PR description
+gh pr edit <number> --body-file updated_description.md
+
+# Or inline (for small updates)
+gh pr edit <number> --body "Updated description..."
+```
+
+**If `gh pr edit` fails:**
+If you encounter GraphQL errors, use the REST API as a fallback:
+```bash
+curl -s -X PATCH \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/OWNER/REPO/pulls/<number> \
+  -d '{"body": "new body content"}'
+```
+
+**When to update:**
+| Scenario | Action |
+|----------|--------|
+| Significant architectural changes | Update to reflect new approach |
+| Added tests per review request | Add "Testing" section |
+| Fixed bugs mentioned in review | Add "Bug Fixes" summary table |
+| Breaking changes introduced | Update "Breaking Changes" section |
+| Minor style fixes | Optional - may skip |
+
 ### Step 5: Merge PR ⭐ USER CONFIRMATION REQUIRED
 
 **⚠️ NEVER auto-merge. Always ask user first.**
@@ -174,6 +217,8 @@ User: "review pr"
 Present summary → User confirms fixes
   ↓
 Apply fixes, commit, push
+  ↓
+[Optional] Update PR description to reflect changes
   ↓
 Round 2: New comments or follow-up
   ↓
@@ -230,6 +275,12 @@ User: "fix all"
 → Commit → Push
 → "Fixes pushed. PR updated."
 
+User: "update pr description"
+→ "Would you like me to update the PR description to reflect the fixes?"
+→ User selects: Yes
+→ Update description with fixes summary
+→ "PR description updated."
+
 User: "is it ready to merge?"
 → Check comments (all resolved?) ✓
 → Check CI status (passing?) ✓
@@ -246,6 +297,9 @@ User: "is it ready to merge?"
 # Auto-fix without asking
 gh pr view --comments | fix-all.sh
 
+# Auto-update PR description without asking
+gh pr edit <number> --body "..."
+
 # Auto-merge without asking
 gh pr merge --squash
 ```
@@ -257,6 +311,10 @@ gh pr view --comments
 # "Select: 1-Fix all, 2-Critical only, 3-Show code, 4-Ignore"
 # User selects: 2
 # Then apply fixes
+
+# Ask before updating description
+# "Update PR description to reflect changes?"
+# User confirms → Then update
 
 # Check → Ask → Merge
 gh pr checks
