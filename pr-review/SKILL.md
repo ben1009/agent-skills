@@ -249,7 +249,11 @@ Present summary → User confirms fixes
   ↓
 Apply fixes, commit, push
   ↓
+Reply "Fixed" to each review comment via API
+  ↓
 [Optional] Update PR description to reflect changes
+  ↓
+User manually resolves conversations in GitHub UI
   ↓
 Round 2: New comments or follow-up
   ↓
@@ -261,6 +265,8 @@ User confirms merge
   ↓
 Merge PR
 ```
+
+**Note:** Resolving conversations (clicking "Resolve") cannot be done via CLI/API - this must be done manually in the GitHub UI.
 
 ### Human Reviewer + Bots
 
