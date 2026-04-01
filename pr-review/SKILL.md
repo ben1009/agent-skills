@@ -128,6 +128,37 @@ fix: address review comments - use Path instead of PathBuf
 - Improves API ergonomics
 ```
 
+**Reply to review comments after fixing:**
+
+After pushing fixes, you should reply to each review comment to indicate the issue has been addressed:
+
+```bash
+# Get comment IDs
+gh pr view <number> --comments
+
+# Reply to a comment (preferred - creates a reply thread)
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments/<comment_id>/replies \
+  -d '{"body": "Fixed"}'
+```
+
+**Important:** 
+- Use the `/replies` endpoint to create a proper reply thread
+- Do NOT edit the original comment body (that's the reviewer's comment)
+- Simple replies like "Fixed" or "✅ Fixed" are sufficient
+- The PR author must manually click "Resolve conversation" in the GitHub UI
+
+**Example workflow:**
+```
+1. Fix the code issue
+2. git add -A && git commit -m "fix: address review comment"
+3. git push origin <branch>
+4. Reply "Fixed" to each review comment via API
+5. User manually resolves conversations in GitHub UI
+```
+
 ### Step 4b: Update PR Description (Optional)
 
 After addressing review comments, consider updating the PR description to reflect:
