@@ -310,7 +310,8 @@ User: "fix all"
 → User selects: 2
 → Apply critical fixes only
 → Commit → Push
-→ "Fixes pushed. PR updated."
+→ Reply "Fixed" to each review comment via API
+→ "Fixes pushed and comments replied. PR updated."
 
 User: "update pr description"
 → "Would you like me to update the PR description to reflect the fixes?"
@@ -319,7 +320,8 @@ User: "update pr description"
 → "PR description updated."
 
 User: "is it ready to merge?"
-→ Check comments (all resolved?) ✓
+→ Check comments (replied to all?)
+→ Remind user: "Please resolve conversations in GitHub UI if not done"
 → Check CI status (passing?) ✓
 → "All checks pass. Select merge option:"
 → User selects: 1 (merge with squash)
