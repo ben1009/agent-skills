@@ -148,7 +148,29 @@ curl -s -X POST \
 - Use the `/replies` endpoint to create a proper reply thread
 - Do NOT edit the original comment body (that's the reviewer's comment)
 - Simple replies like "Fixed" or "✅ Fixed" are sufficient
-- **Resolving comments: CANNOT be done via CLI/API** - The PR author must manually click "Resolve conversation" in the GitHub UI (GitHub doesn't expose this action in their API)
+- **Resolving comments: CAN be done via GraphQL API** (see below)
+
+**Resolving review threads via GraphQL:**
+
+GitHub's REST API doesn't support resolving, but the GraphQL API does via the `resolveReviewThread` mutation:
+
+```bash
+# First, get the thread ID
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: N) { reviewThreads(first: 10) { nodes { id isResolved comments(first: 1) { nodes { body } } } } } } }"}'
+
+# Then resolve the thread
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "mutation { resolveReviewThread(input: {threadId: \"THREAD_ID\"}) { clientMutationId } }"}'
+```
+
+Note: Each review comment creates a "thread". You resolve the thread, not individual comments.
 
 **Example workflow:**
 ```
@@ -156,7 +178,7 @@ curl -s -X POST \
 2. git add -A && git commit -m "fix: address review comment"
 3. git push origin <branch>
 4. Reply "Fixed" to each review comment via API
-5. User manually resolves conversations in GitHub UI
+5. [Optional] Resolve review threads via GraphQL API
 ```
 
 ### Step 4b: Update PR Description (Optional)
@@ -253,7 +275,7 @@ Reply "Fixed" to each review comment via API
   ↓
 [Optional] Update PR description to reflect changes
   ↓
-User manually resolves conversations in GitHub UI
+[Optional] Resolve review threads via GraphQL API
   ↓
 Round 2: New comments or follow-up
   ↓
