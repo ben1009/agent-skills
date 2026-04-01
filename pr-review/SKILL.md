@@ -148,7 +148,7 @@ curl -s -X POST \
 - Use the `/replies` endpoint to create a proper reply thread
 - Do NOT edit the original comment body (that's the reviewer's comment)
 - Simple replies like "Fixed" or "✅ Fixed" are sufficient
-- The PR author must manually click "Resolve conversation" in the GitHub UI
+- **Resolving comments: CANNOT be done via CLI/API** - The PR author must manually click "Resolve conversation" in the GitHub UI (GitHub doesn't expose this action in their API)
 
 **Example workflow:**
 ```
