@@ -133,20 +133,36 @@ fix: address review comments - use Path instead of PathBuf
 After pushing fixes, you should reply to each review comment to indicate the issue has been addressed:
 
 ```bash
-# Get comment IDs
+# Get comment IDs and latest commit SHA
 gh pr view <number> --comments
+LATEST_SHA=$(gh pr view <number> --json headRefOid -q '.headRefOid')
 
-# Reply to a comment (preferred - creates a reply thread)
+# Method 1: Reply using in_reply_to (preferred - creates proper review thread reply)
 curl -s -X POST \
   -H "Authorization: token $(gh auth token)" \
   -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments/<comment_id>/replies \
-  -d '{"body": "Fixed"}'
+  https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments \
+  -d '{
+    "body": "Fixed",
+    "in_reply_to": COMMENT_ID,
+    "commit_id": "'"$LATEST_SHA"'",
+    "path": "file-path.html",
+    "line": LINE_NUMBER,
+    "side": "RIGHT"
+  }'
+
+# Method 2: Fallback - add general PR comment if Method 1 fails
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Accept: application/vnd.github.v3+json" \
+  https://api.github.com/repos/OWNER/REPO/issues/<number>/comments \
+  -d '{"body": "@reviewer Fixed!"}'
 ```
 
 **Important:** 
-- Use the `/replies` endpoint to create a proper reply thread
-- Do NOT edit the original comment body (that's the reviewer's comment)
+- Use `in_reply_to` field to create a proper reply in the review thread
+- The reply will appear at the code line in the PR review interface
+- Method 2 creates a general PR comment (not a review reply) - only use as fallback
 - Simple replies like "Fixed" or "✅ Fixed" are sufficient
 - **Resolving comments: CAN be done via GraphQL API** (see below)
 
