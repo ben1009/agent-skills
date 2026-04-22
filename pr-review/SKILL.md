@@ -9,8 +9,11 @@ Handle the complete PR review workflow: review comments, CI checks, and merge.
 
 **⚠️ IMPORTANT: This skill NEVER auto-fixes or auto-merges. Always asks user before making changes.**
 
-**🚫 HARD RULE: NEVER resolve a review conversation thread without first posting a reply comment.**
+**🚫 HARD RULE 1: NEVER resolve a review conversation thread without first posting a reply comment.**
 This applies to bot comments, human comments, and all review threads. Always reply explaining what was fixed before resolving.
+
+**🚫 HARD RULE 2: NEVER merge a PR while any review comment or conversation thread remains unresolved.**
+All comments must be replied to and resolved before merge. If a comment is intentionally skipped, explicitly mark it resolved with a reply explaining why.
 
 ## Usage
 
@@ -220,6 +223,18 @@ gh pr edit <number> --body-file updated_description.md
 # Or inline (for small updates)
 gh pr edit <number> --body "Updated description..."
 ```
+
+## GitHub Native Enforcement
+
+GitHub branch protection can enforce these rules automatically:
+
+| Rule | GitHub Setting | Path |
+|------|---------------|------|
+| Require resolved conversations before merge | **Require conversation resolution before merging** | Settings → Branches → Branch protection rule |
+| Require PR reviews | **Require a pull request review before merging** | Settings → Branches → Branch protection rule |
+| Require passing checks | **Require status checks to pass** | Settings → Branches → Branch protection rule |
+
+Enable **"Require conversation resolution before merging"** on the target branch (e.g. `main`) to block merges with unresolved review threads at the platform level.
 
 **If `gh pr edit` fails:**
 If you encounter GraphQL errors, use the REST API as a fallback:
