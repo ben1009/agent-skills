@@ -9,6 +9,9 @@ Handle the complete PR review workflow: review comments, CI checks, and merge.
 
 **⚠️ IMPORTANT: This skill NEVER auto-fixes or auto-merges. Always asks user before making changes.**
 
+**🚫 HARD RULE: NEVER resolve a review conversation thread without first posting a reply comment.**
+This applies to bot comments, human comments, and all review threads. Always reply explaining what was fixed before resolving.
+
 ## Usage
 
 ```bash
@@ -128,9 +131,9 @@ fix: address review comments - use Path instead of PathBuf
 - Improves API ergonomics
 ```
 
-**Reply to review comments after fixing:**
+**Reply to review comments after fixing (MANDATORY):**
 
-After pushing fixes, you should reply to each review comment to indicate the issue has been addressed:
+After pushing fixes, you MUST reply to each review comment before resolving the conversation. Never resolve without replying first.
 
 ```bash
 # Get comment IDs and latest commit SHA
@@ -163,8 +166,9 @@ curl -s -X POST \
 - Use `in_reply_to` field to create a proper reply in the review thread
 - The reply will appear at the code line in the PR review interface
 - Method 2 creates a general PR comment (not a review reply) - only use as fallback
-- Simple replies like "Fixed" or "✅ Fixed" are sufficient
-- **Resolving comments: CAN be done via GraphQL API** (see below)
+- Replies must explain what was changed (not just "Fixed")
+- Examples: `Fixed. Added tie-breaker to row_number() for stable ranking.` or `Fixed. Removed redundant unique constraint from url column.`
+- **Resolving comments: ONLY after posting a reply** (see below)
 
 **Resolving review threads via GraphQL:**
 
@@ -304,7 +308,7 @@ User confirms merge
 Merge PR
 ```
 
-**Note:** Resolving conversations (clicking "Resolve") cannot be done via CLI/API - this must be done manually in the GitHub UI.
+**Note:** Resolving conversations (clicking "Resolve") cannot be done via CLI/API - this must be done manually in the GitHub UI. **Never resolve a conversation without first posting a reply.**
 
 ### Human Reviewer + Bots
 
@@ -313,6 +317,7 @@ When both human and bot comments exist:
 2. Group bot comments by severity
 3. Ask user which to address
 4. Suggest: "Address human comments first, then evaluate bot suggestions"
+5. **Reply to ALL addressed comments** before resolving — bot comments get the same treatment as human comments
 
 ## Error Handling
 
