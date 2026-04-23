@@ -149,7 +149,7 @@ curl -s -X POST \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments \
   -d '{
-    "body": "Fixed",
+    "body": "Fixed. Replaced incr+expire with atomic SET NX EX to prevent permanent lockout if expire never runs.",
     "in_reply_to": COMMENT_ID,
     "commit_id": "'"$LATEST_SHA"'",
     "path": "file-path.html",
@@ -162,15 +162,18 @@ curl -s -X POST \
   -H "Authorization: token $(gh auth token)" \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/repos/OWNER/REPO/issues/<number>/comments \
-  -d '{"body": "@reviewer Fixed!"}'
+  -d '{"body": "@reviewer Addressed your feedback — see commit abc123 for details."}'
 ```
 
 **Important:** 
 - Use `in_reply_to` field to create a proper reply in the review thread
 - The reply will appear at the code line in the PR review interface
 - Method 2 creates a general PR comment (not a review reply) - only use as fallback
-- Replies must explain what was changed (not just "Fixed")
-- Examples: `Fixed. Added tie-breaker to row_number() for stable ranking.` or `Fixed. Removed redundant unique constraint from url column.`
+- **Replies must explain what was changed or why a change was NOT made.**
+  - Good: `Fixed. Added tie-breaker to row_number() for stable ranking.`
+  - Good: `Fixed. Removed redundant unique constraint from url column.`
+  - Good: `Not fixed. Supabase JS v2 does not support arrays here; reverted with a comment explaining why.`
+  - Bad: `Fixed` (too vague)
 - **Resolving comments: ONLY after posting a reply** (see below)
 
 **Resolving review threads via GraphQL:**
@@ -200,7 +203,7 @@ Note: Each review comment creates a "thread". You resolve the thread, not indivi
 1. Fix the code issue
 2. git add -A && git commit -m "fix: address review comment"
 3. git push origin <branch>
-4. Reply "Fixed" to each review comment via API
+4. Reply to each review comment via API explaining what was fixed or why no fix is needed
 5. Resolve review threads via GraphQL API
 6. Post a comment asking reviewers / bots to re-review
 ```
