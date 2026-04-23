@@ -201,7 +201,8 @@ Note: Each review comment creates a "thread". You resolve the thread, not indivi
 2. git add -A && git commit -m "fix: address review comment"
 3. git push origin <branch>
 4. Reply "Fixed" to each review comment via API
-5. [Optional] Resolve review threads via GraphQL API
+5. Resolve review threads via GraphQL API
+6. Post a comment asking reviewers / bots to re-review
 ```
 
 ### Step 4b: Update PR Description (Optional)
@@ -223,6 +224,42 @@ gh pr edit <number> --body-file updated_description.md
 # Or inline (for small updates)
 gh pr edit <number> --body "Updated description..."
 ```
+
+### Step 4c: Resolve Conversations and Request Re-review (Required)
+
+After all fixes are pushed and replies are posted, you MUST resolve every review thread before asking for a re-review.
+
+**Get unresolved thread IDs:**
+```bash
+gh api repos/OWNER/REPO/pulls/<number>/comments --jq '.[] | select(.state != "resolved") | .id'
+```
+
+**Resolve each thread via GraphQL:**
+```bash
+# Fetch all thread IDs
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved } } } } }"}'
+
+# Resolve each unresolved thread
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "mutation { resolveReviewThread(input: {threadId: \"THREAD_ID\"}) { clientMutationId } }"}'
+```
+
+**Request re-review:**
+Post a general PR comment mentioning the reviewers (including bot accounts):
+```bash
+gh pr comment <number> --body "All review comments have been addressed and resolved. Please re-review.
+
+@gemini-code-assist @codex review"
+```
+
+**Hard rule:** Never ask for re-review while any conversation thread remains unresolved.
 
 ## GitHub Native Enforcement
 
