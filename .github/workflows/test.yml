@@ -17,6 +17,11 @@ jobs:
           chmod +x tests/test_sync.sh
           ./tests/test_sync.sh
 
+      - name: Run skill tests
+        run: |
+          chmod +x tests/test_skills.sh
+          ./tests/test_skills.sh
+
       - name: Test scripts are executable
         run: |
           test -x sync-to-local.sh
