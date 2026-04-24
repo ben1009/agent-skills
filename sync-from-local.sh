@@ -12,12 +12,18 @@ echo "Syncing skills from $SKILLS_DIR..."
 while IFS= read -r skill_file; do
     skill_dir=$(dirname "$skill_file")
     skill=$(basename "$skill_dir")
-    
+
     # Skip if it's the root directory
     if [ "$skill" = "." ]; then
         continue
     fi
-    
+
+    # Only sync skills that already exist in the repo
+    if [ ! -d "$REPO_DIR/$skill" ]; then
+        echo "  ⊘ $skill (skipped — not in repo)"
+        continue
+    fi
+
     echo "  → $skill"
     mkdir -p "$REPO_DIR/$skill"
     cp "$SKILLS_DIR/$skill/SKILL.md" "$REPO_DIR/$skill/"
