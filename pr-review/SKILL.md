@@ -234,7 +234,12 @@ After all fixes are pushed and replies are posted, you MUST resolve every review
 
 **Get unresolved thread IDs:**
 ```bash
-gh api repos/OWNER/REPO/pulls/<number>/comments --jq '.[] | select(.state != "resolved") | .id'
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: <number>) { reviewThreads(first: 100) { nodes { id isResolved } } } } }"}' | \
+  jq -r '.data.repository.pullRequest.reviewThreads.nodes[] | select(.isResolved == false) | .id'
 ```
 
 **Resolve each thread via GraphQL:**
@@ -244,7 +249,7 @@ curl -s -X POST \
   -H "Authorization: token $(gh auth token)" \
   -H "Content-Type: application/json" \
   https://api.github.com/graphql \
-  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved } } } } }"}'
+  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: <number>) { reviewThreads(first: 100) { nodes { id isResolved } } } } }"}'
 
 # Resolve each unresolved thread
 curl -s -X POST \
