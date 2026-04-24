@@ -115,7 +115,7 @@ The repository is designed to sync with the local agents skills directory at `~/
 ./sync-from-local.sh
 git add -A
 git commit -m "sync: update skills from local"
-git push origin main
+git push origin master
 ```
 
 **Repo → Local (Test changes):**
