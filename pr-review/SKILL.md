@@ -382,6 +382,62 @@ When both human and bot comments exist:
 4. Suggest: "Address human comments first, then evaluate bot suggestions"
 5. **Reply to ALL addressed comments** before resolving — bot comments get the same treatment as human comments
 
+## General Review Comments (Non-Line-Specific)
+
+Sometimes reviewers (especially bots or via certain integrations) **cannot create individual line-level review comments** and instead post all feedback as a single general PR comment or issue comment. This loses GitHub's built-in per-thread tracking, so you must handle it manually.
+
+### How to Identify
+- The comment appears under the general "Conversation" tab, not the "Files changed" tab
+- No file path or line number is attached to the comment
+- Multiple unrelated issues are bundled into one comment
+
+### Handling Workflow
+
+**Step 1: Parse and map the feedback yourself**
+
+Break the general comment into individual action items and map each to specific files/lines:
+
+```
+| Feedback Point | File | Line | Severity |
+|---|---|---|---|
+| Script execution order bug | src/x.js | 42 | Critical |
+| Brittle CSS selector | src/y.css | 88 | Medium |
+```
+
+**Step 2: Address each point in code**
+
+Fix them the same way you would fix line-level review comments — commit per logical fix.
+
+**Step 3: Post a structured reply**
+
+Reply to the general comment with explicit references to each fix:
+
+```
+Thanks for the review. Addressed all N points:
+
+1. **Script execution order**: Wrapped in DOMContentLoaded listener
+   → commit `abc1234`
+
+2. **Brittle CSS selector**: Simplified to generic `.speaking`
+   → commit `abc1234`
+
+3. **Test logic error**: Removed || short-circuit
+   → commit `def5678`
+```
+
+**Step 4: Track completion manually**
+
+Since there's no "resolve conversation" button for general comments, update the PR description or post a follow-up comment marking everything done.
+
+### Key Differences from Line-Level Comments
+
+| Aspect | Line-Level Comment | General Comment |
+|--------|-------------------|-----------------|
+| GitHub tracking | Built-in resolve/threads | None — track manually |
+| Reply location | Inline on code | General PR comment |
+| Precision | Exact file + line | Must infer mapping |
+| API for reply | `in_reply_to` + thread ID | Standard issue comment API |
+
 ## Error Handling
 
 | Issue | Solution |
