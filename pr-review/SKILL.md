@@ -208,7 +208,7 @@ Note: Each review comment creates a "thread". You resolve the thread, not indivi
 6. Post a comment asking reviewers / bots to re-review
 ```
 
-### Step 4b: Update PR Description (Optional)
+### Step 4b: Update PR Description (Required)
 
 After addressing review comments, consider updating the PR description to reflect:
 - Changes made during review
@@ -216,8 +216,11 @@ After addressing review comments, consider updating the PR description to reflec
 - New tests added
 - Breaking changes introduced
 
-**Ask user:**
-> "I've addressed the review comments and pushed fixes. Would you like me to update the PR description to reflect these changes?"
+**After addressing review comments, update the PR description to reflect:**
+- Changes made during review
+- Fixes applied (with before/after summary)
+- New tests added
+- Breaking changes introduced
 
 **To update:**
 ```bash
@@ -353,7 +356,7 @@ Apply fixes, commit, push
   ↓
 Reply "Fixed" to each review comment via API
   ↓
-[Optional] Update PR description to reflect changes
+[Required] Update PR description to reflect changes
   ↓
 [Required] Resolve review threads via GraphQL API
   ↓
