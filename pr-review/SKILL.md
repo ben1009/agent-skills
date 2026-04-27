@@ -355,7 +355,7 @@ Reply "Fixed" to each review comment via API
   ↓
 [Optional] Update PR description to reflect changes
   ↓
-[Optional] Resolve review threads via GraphQL API
+[Required] Resolve review threads via GraphQL API
   ↓
 Round 2: New comments or follow-up
   ↓
@@ -368,7 +368,7 @@ User confirms merge
 Merge PR
 ```
 
-**Note:** Resolving conversations (clicking "Resolve") cannot be done via CLI/API - this must be done manually in the GitHub UI. **Never resolve a conversation without first posting a reply.**
+**Note:** Resolving conversations can be done via the GraphQL API using `resolveReviewThread` (see code examples above). The `gh` CLI does not support this directly. **Never resolve a conversation without first posting a reply.**
 
 ### Human Reviewer + Bots
 
