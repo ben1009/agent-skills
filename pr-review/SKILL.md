@@ -51,11 +51,11 @@ All comments must be replied to and resolved before merge. If a comment is inten
 # Method 1: Try gh CLI first
 gh pr view <number> --comments
 
-# Method 2: If GraphQL errors, use REST API
+# Method 2: If GraphQL errors, use REST API (always use per_page=100 to avoid missing comments)
 curl -s \
   -H "Authorization: token $(gh auth token)" \
   -H "Accept: application/vnd.github.v3+json" \
-  https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments
+  "https://api.github.com/repos/OWNER/REPO/pulls/<number>/comments?per_page=100"
 
 # Method 3: Get issue comments too (general discussion)
 curl -s \
