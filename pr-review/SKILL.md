@@ -15,6 +15,9 @@ This applies to bot comments, human comments, and all review threads. Always rep
 **🚫 HARD RULE 2: NEVER merge a PR while any review comment or conversation thread remains unresolved.**
 All comments must be replied to and resolved before merge. If a comment is intentionally skipped, explicitly mark it resolved with a reply explaining why.
 
+**🚫 HARD RULE 3: ALWAYS use `--repo OWNER/REPO` with every `gh` CLI command.**
+`gh` may default to the wrong remote (upstream vs origin/fork). Always specify the target repo explicitly.
+
 ## Usage
 
 ```bash
@@ -45,11 +48,13 @@ All comments must be replied to and resolved before merge. If a comment is inten
 
 ## Workflow
 
+**All `gh` commands MUST use `--repo OWNER/REPO` to target the correct repository.**
+
 ### Step 1: Fetch Review Comments
 
 ```bash
 # Method 1: Try gh CLI first
-gh pr view <number> --comments
+gh pr view <number> --comments --repo OWNER/REPO
 
 # Method 2: If GraphQL errors, use REST API (always use per_page=100 to avoid missing comments)
 curl -s \
@@ -68,13 +73,13 @@ curl -s \
 
 ```bash
 # Check current status
-gh pr checks <number>
+gh pr checks <number> --repo OWNER/REPO
 
 # Watch checks in real-time
-gh pr checks <number> --watch
+gh pr checks <number> --watch --repo OWNER/REPO
 
 # View PR overview with status
-gh pr view <number>
+gh pr view <number> --repo OWNER/REPO
 ```
 
 ### Step 3: Present Summary
@@ -140,8 +145,8 @@ After pushing fixes, you MUST reply to each review comment before resolving the 
 
 ```bash
 # Get comment IDs and latest commit SHA
-gh pr view <number> --comments
-LATEST_SHA=$(gh pr view <number> --json headRefOid -q '.headRefOid')
+gh pr view <number> --comments --repo OWNER/REPO
+LATEST_SHA=$(gh pr view <number> --json headRefOid -q '.headRefOid' --repo OWNER/REPO)
 
 # Method 1: Reply using in_reply_to (preferred - creates proper review thread reply)
 curl -s -X POST \
@@ -225,10 +230,10 @@ After addressing review comments, consider updating the PR description to reflec
 **To update:**
 ```bash
 # Edit PR description
-gh pr edit <number> --body-file updated_description.md
+gh pr edit <number> --body-file updated_description.md --repo OWNER/REPO
 
 # Or inline (for small updates)
-gh pr edit <number> --body "Updated description..."
+gh pr edit <number> --body "Updated description..." --repo OWNER/REPO
 ```
 
 ### Step 4c: Resolve Conversations and Request Re-review (Required)
@@ -265,7 +270,7 @@ curl -s -X POST \
 **Request re-review:**
 Post a general PR comment mentioning the reviewers (including bot accounts):
 ```bash
-gh pr comment <number> --body "All review comments have been addressed and resolved. Please re-review.
+gh pr comment <number> --repo OWNER/REPO --body "All review comments have been addressed and resolved. Please re-review.
 
 @gemini-code-assist @codex review"
 ```
@@ -327,16 +332,16 @@ curl -s -X PATCH \
 
 ```bash
 # Check final status
-gh pr checks <number>
+gh pr checks <number> --repo OWNER/REPO
 
 # Merge (default: squash)
-gh pr merge <number> --squash --delete-branch
+gh pr merge <number> --squash --delete-branch --repo OWNER/REPO
 
 # Or with merge commit
-gh pr merge <number> --merge --delete-branch
+gh pr merge <number> --merge --delete-branch --repo OWNER/REPO
 
 # Or rebase
-gh pr merge <number> --rebase --delete-branch
+gh pr merge <number> --rebase --delete-branch --repo OWNER/REPO
 ```
 
 ## Patterns
@@ -443,6 +448,7 @@ Since there's no "resolve conversation" button for general comments, update the 
 | Issue | Solution |
 |-------|----------|
 | `gh` CLI GraphQL errors | Use REST API fallback |
+| `gh` targets wrong remote (upstream vs origin) | Use `--repo OWNER/REPO` flag, e.g. `gh pr comment 76 --repo ben1009/mini-lsm` |
 | Stash pop conflicts | Ask user to resolve manually |
 | Push rejected (non-fast-forward) | `git pull origin <branch>` first, then push |
 | Network timeout | Retry with exponential backoff |
@@ -487,7 +493,7 @@ User: "is it ready to merge?"
 → Check CI status (passing?) ✓
 → "All checks pass. Select merge option:"
 → User selects: 1 (merge with squash)
-→ gh pr merge --squash --delete-branch
+→ gh pr merge --squash --delete-branch --repo OWNER/REPO
 → "PR #17 merged successfully!"
 ```
 
@@ -496,19 +502,22 @@ User: "is it ready to merge?"
 ❌ **Never do this:**
 ```bash
 # Auto-fix without asking
-gh pr view --comments | fix-all.sh
+gh pr view --comments --repo OWNER/REPO | fix-all.sh
 
 # Auto-update PR description without asking
-gh pr edit <number> --body "..."
+gh pr edit <number> --body "..." --repo OWNER/REPO
 
 # Auto-merge without asking
-gh pr merge --squash
+gh pr merge --squash --repo OWNER/REPO
+
+# Omit --repo (may target wrong remote)
+gh pr comment 76 --body "done"
 ```
 
 ✅ **Always do this:**
 ```bash
 # Present → Ask → Fix
-gh pr view --comments
+gh pr view --comments --repo OWNER/REPO
 # "Select: 1-Fix all, 2-Critical only, 3-Show code, 4-Ignore"
 # User selects: 2
 # Then apply fixes
@@ -518,7 +527,7 @@ gh pr view --comments
 # User confirms → Then update
 
 # Check → Ask → Merge
-gh pr checks
+gh pr checks --repo OWNER/REPO
 # "Select: 1-Squash, 2-Merge commit, 3-Rebase, 4-Cancel"
 # User selects: 1
 # Then merge
