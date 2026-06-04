@@ -398,9 +398,11 @@ Merge PR
 After fixes are pushed and reviewers are pinged, **stop and wait** for their response. Do not proactively run another review round.
 
 **The loop ends when:**
-- Reviewer replies with approval / LGTM / "looks good"
+- Reviewer replies with approval / LGTM / "looks good" / "good to go" / "no more comments"
 - A new review round produces **zero new comments** (only resolved threads from previous round)
 - CI passes and all threads are resolved
+
+**Interpretation:** If the reviewer's response is a thumbs-up, an approval, or any phrase indicating satisfaction (e.g., "all good", "no more comments", "good to go", "resolved"), the loop is complete. Do not ask for another review round unless the user explicitly requests it.
 
 **Do NOT continue looping if:**
 - You already fixed all comments and pinged reviewers
