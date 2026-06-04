@@ -267,15 +267,32 @@ curl -s -X POST \
   -d '{"query": "mutation { resolveReviewThread(input: {threadId: \"THREAD_ID\"}) { clientMutationId } }"}'
 ```
 
-**Request re-review:**
-Post a general PR comment mentioning the reviewers (including bot accounts):
+### Step 4d: Ping Reviewers to Re-review (Required)
+
+After resolving all threads, you MUST explicitly ping the reviewers so they know the PR is ready for another look. Do not assume they will notice the pushes automatically.
+
+**Post a general PR comment @-mentioning every reviewer (human + bot):**
 ```bash
 gh pr comment <number> --repo OWNER/REPO --body "All review comments have been addressed and resolved. Please re-review.
 
-@gemini-code-assist @codex review"
+@gemini-code-assist @coderabbitai"
 ```
 
-**Hard rule:** Never ask for re-review while any conversation thread remains unresolved.
+**How to find reviewer handles:**
+```bash
+# List all review authors
+curl -s -X POST \
+  -H "Authorization: token $(gh auth token)" \
+  -H "Content-Type: application/json" \
+  https://api.github.com/graphql \
+  -d '{"query": "query { repository(owner: \"OWNER\", name: \"REPO\") { pullRequest(number: <number>) { reviews(first: 100) { nodes { author { login } } } } } }"}' | \
+  jq -r '.data.repository.pullRequest.reviews.nodes[].author.login' | sort -u
+```
+
+**Hard rules:**
+- Never ask for re-review while any conversation thread remains unresolved.
+- Always @-mention the reviewer; a silent push is invisible to bots.
+- Include bot accounts (e.g. `@gemini-code-assist`, `@coderabbitai`) so they re-trigger their checks.
 
 ## GitHub Native Enforcement
 
@@ -376,7 +393,19 @@ User confirms merge
 Merge PR
 ```
 
-**Note:** Resolving conversations can be done via the GraphQL API using `resolveReviewThread` (see code examples above). The `gh` CLI does not support this directly. **Never resolve a conversation without first posting a reply.**
+### Stopping Condition for Review Loop
+
+After fixes are pushed and reviewers are pinged, **stop and wait** for their response. Do not proactively run another review round.
+
+**The loop ends when:**
+- Reviewer replies with approval / LGTM / "looks good"
+- A new review round produces **zero new comments** (only resolved threads from previous round)
+- CI passes and all threads are resolved
+
+**Do NOT continue looping if:**
+- You already fixed all comments and pinged reviewers
+- No new comments appear after the re-review request
+- The only remaining "reviews" are your own reply comments
 
 ### Human Reviewer + Bots
 
