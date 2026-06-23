@@ -19,6 +19,7 @@ Skills are self-contained directories with a `SKILL.md` file that contains:
 | `git-workflow` | Git best practices and workflows for clean commit history and effective collaboration |
 | `pr-create` | Create a pull request from local changes with proper checks and optional comment watching |
 | `pr-review` | Handle pull request review comments with user control over all fixes |
+| `rust-skills` | Comprehensive Rust coding guidelines with rules for ownership, error handling, async, performance, testing, and style |
 
 ## Technology Stack
 
@@ -42,6 +43,8 @@ agent-skills/
 ├── pr-create/              # PR creation skill
 │   └── SKILL.md
 ├── pr-review/              # PR review skill
+│   └── SKILL.md
+├── rust-skills/            # Rust coding guidelines skill
 │   └── SKILL.md
 ├── tests/                  # Test suite
 │   └── test_sync.sh        # Bash tests for sync scripts

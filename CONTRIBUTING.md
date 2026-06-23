@@ -28,7 +28,7 @@ cd /path/to/agent-skills
 Or manually:
 
 ```bash
-cp -r git-workflow pr-create pr-review ~/.config/agents/skills/
+cp -r git-workflow pr-create pr-review rust-skills ~/.config/agents/skills/
 ```
 
 ## Adding New Skills
