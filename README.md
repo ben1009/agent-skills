@@ -15,6 +15,8 @@ A collection of reusable skills for AI agents.
 
 These skills are designed to be used with AI agents (Claude, GPT, Gemini, Kimi, etc.). Place them in your agents skills directory:
 
+When working in a Rust repository, read `rust-skills/SKILL.md` before changing Rust code.
+
 ```
 ~/.config/agents/skills/
 ├── git-workflow/

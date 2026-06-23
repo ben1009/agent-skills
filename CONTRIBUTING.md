@@ -4,6 +4,8 @@
 
 This repository is kept in sync with the local skills directory at `~/.config/agents/skills/`.
 
+When working on Rust repos, read `rust-skills/SKILL.md` before editing Rust code.
+
 ### Local → Repo (Push to GitHub)
 
 When you've updated skills locally and want to push to GitHub:
